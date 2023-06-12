@@ -14,5 +14,9 @@ foreach ($profile in $profiles) {
 
     # Delete the user profile
     Write-Host "Deleting profile: $username"
-    $profile.Delete()
+    try {
+        Remove-WmiObject -InputObject $profile -ErrorAction Stop
+    } catch {
+        Write-Host "Failed to delete profile: $username. Error: $_"
+    }
 }
