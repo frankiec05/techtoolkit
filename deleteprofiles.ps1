@@ -1,8 +1,5 @@
 $profilesToExclude = @("zo-admin", "NetworkService", "LocalService", "systemprofile", "autopilotstudent1", "autopilotteacher1", "Administrator", "DefaultAccount", "Frank", "Guest", "WDAGUtilityAccount")
 
-# Import the PSCX module
-Import-Module Pscx
-
 # Get a list of all user profiles
 $profiles = Get-WmiObject -Class Win32_UserProfile | Where-Object { $_.Special -eq $false }
 
@@ -25,19 +22,12 @@ foreach ($profile in $profiles) {
             Stop-Process -Id $process.Id -Force
         }
 
-        # Unlock locked files within the user profile directory
-        Get-ChildItem -Path $profile.LocalPath -Recurse | ForEach-Object {
-            $filePath = $_.FullName
-            try {
-                Unlock-File -Path $filePath -Force
-                Write-Host "Unlocked file: $filePath"
-            } catch {
-                Write-Host "Failed to unlock file: $filePath. Error: $_"
-            }
-        }
+        # Move the user profile directory to a temporary location
+        $tempPath = Join-Path -Path $env:TEMP -ChildPath $username
+        Move-Item -Path $profile.LocalPath -Destination $tempPath -Force
 
-        # Delete the user profile directory
-        Remove-Item -Path $profile.LocalPath -Force -Recurse -ErrorAction Stop
+        # Delete the user profile directory from the temporary location
+        Remove-Item -Path $tempPath -Force -Recurse -ErrorAction Stop
     } catch {
         Write-Host "Failed to delete profile: $username. Error: $_"
     }
