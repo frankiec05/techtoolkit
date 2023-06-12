@@ -15,6 +15,14 @@ foreach ($profile in $profiles) {
     # Delete the user profile
     Write-Host "Deleting profile: $username"
     try {
+        # Terminate processes using the profile directory
+        $processes = Get-Process | Where-Object { $_.Path -like "$($profile.LocalPath)\*" }
+        foreach ($process in $processes) {
+            Write-Host "Terminating process: $($process.ProcessName) (ID: $($process.Id))"
+            Stop-Process -Id $process.Id -Force
+        }
+
+        # Delete the user profile directory
         Remove-Item -Path $profile.LocalPath -Force -Recurse -ErrorAction Stop
     } catch {
         Write-Host "Failed to delete profile: $username. Error: $_"
