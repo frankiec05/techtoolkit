@@ -1,4 +1,4 @@
-$profilesToExclude = @("zo-admin", "NetworkService", "LocalService", "systemprofile", "autopilotstudent1", "autopilotteacher1", "Administrator", "DefaultAccount", "Frank", "Guest", "WDAGUtilityAccount")
+$profilesToExclude = @("zo-admin", "NetworkService", "LocalService", "systemprofile", "autopilotstudent1", "autopilotteacher1", "Administrator", "DefaultAccount", "Frank", "Guest", "WDAGUtilityAccount", "defaultuser0",)
 
 # Get a list of all user profiles
 $profiles = Get-WmiObject -Class Win32_UserProfile | Where-Object { $_.Special -eq $false }
